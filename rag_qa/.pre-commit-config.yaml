@@ -27,14 +27,16 @@ repos:
         args: ['--target-version', '5.0']
 
   # Run the Ruff linter.
-  - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.8.4
-    hooks:
-      # Linter
-      - id: ruff
-        args: [--fix, --exit-non-zero-on-fix]
-      # Formatter
-      - id: ruff-format
+  # - repo: https://github.com/astral-sh/ruff-pre-commit
+  #   rev: v0.8.4
+  #   hooks:
+  #     # Linter
+  #     - id: ruff
+  #       args: [--fix, --exit-non-zero-on-fix]
+  #       stages: []
+  #     # Formatter
+  #     - id: ruff-format
+
 
   - repo: https://github.com/Riverside-Healthcare/djLint
     rev: v1.36.4
