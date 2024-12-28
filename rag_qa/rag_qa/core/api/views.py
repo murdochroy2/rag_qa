@@ -16,11 +16,11 @@ class DocumentIngestView(APIView):
         serializer = DocumentSerializer(data=request.data)
         if serializer.is_valid():
             file_path = serializer.validated_data["file_path"]
+            name = serializer.validated_data["name"]
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        # Assuming there's a model named Document with a field named file_url
-        Document.objects.create(file_path=file_path)
+        Document.objects.create(file_path=file_path, name=name)
 
         return Response(
             {"message": "Document ingested successfully", "file_path": file_path},
