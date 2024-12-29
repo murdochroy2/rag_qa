@@ -2,6 +2,7 @@ volumes:
   rag_qa_local_postgres_data: {}
   rag_qa_local_postgres_data_backups: {}
   rag_qa_local_redis_data: {}
+  pgvector_data: {}
 
 services:
   django: &django
@@ -26,13 +27,23 @@ services:
     build:
       context: .
       dockerfile: ./compose/production/postgres/Dockerfile
-    image: ankane/pgvector
+    image: rag_qa_local_postgres
     container_name: rag_qa_local_postgres
     volumes:
       - rag_qa_local_postgres_data:/var/lib/postgresql/data
       - rag_qa_local_postgres_data_backups:/backups
     env_file:
       - ./.envs/.local/.postgres
+
+  pgvector:
+    image: ankane/pgvector:0.5.1
+    container_name: rag_qa_local_pgvector
+    environment:
+      - POSTGRES_HOST=pgvector
+    env_file:
+      - ./.envs/.local/.postgres
+    volumes:
+      - pgvector_data:/var/lib/postgresql/data
 
   redis:
     image: docker.io/redis:6

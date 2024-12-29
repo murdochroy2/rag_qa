@@ -1,3 +1,4 @@
+import os
 from django.conf import settings
 from django.core.management.base import BaseCommand
 from langchain.vectorstores.pgvector import PGVector
@@ -24,15 +25,18 @@ class Command(BaseCommand):
         pages = loader.load_and_split()
 
         embeddings = OpenAIEmbeddings()
-        # texts = [doc.page_content for doc in documents]
 
-        collection_name = document.document.name
+        collection_name = document.name
 
-        print(settings.DATABASE_URL)
+        # Pgvector uses a different database
+        DATABASE_URL = \
+            os.getenv("DATABASE_URL") \
+            .replace("postgres://", "postgresql://") \
+            .replace("@postgres", "@pgvector")
 
         db = PGVector.from_documents(
             embedding=embeddings,
             documents=pages,
             collection_name=collection_name,
-            connection_string=settings.DATABASE_URL,
+            connection_string=DATABASE_URL,
         )

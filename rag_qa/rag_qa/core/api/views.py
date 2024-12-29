@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from rag_qa.core.models import Document
-from rag_qa.core.serializers import DocumentSerializer
+from rag_qa.core.api.serializers import DocumentSerializer
 
 
 class DocumentIngestView(APIView):

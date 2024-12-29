@@ -348,3 +348,4 @@ SPECTACULAR_SETTINGS = {
 }
 # Your stuff...
 # ------------------------------------------------------------------------------
+OPENAI_API_KEY = env.str("OPENAI_API_KEY")
