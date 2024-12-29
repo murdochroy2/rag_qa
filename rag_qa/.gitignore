@@ -278,3 +278,6 @@ rag_qa/media/
 .ipython/
 .env
 .envs/.production
+
+# Local media
+/media
