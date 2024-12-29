@@ -2,6 +2,7 @@ volumes:
   rag_qa_local_postgres_data: {}
   rag_qa_local_postgres_data_backups: {}
   rag_qa_local_redis_data: {}
+  pgvector2_data: {}
 
 services:
   django: &django
@@ -40,6 +41,18 @@ services:
     
     volumes:
       - rag_qa_local_redis_data:/data
+
+  pgvector2:
+    image: ankane/pgvector   # A prebuilt image with pgvector installed
+    container_name: rag_qa_local_pgvector2
+    environment:
+      - POSTGRES_HOST=pgvector2
+    env_file:
+      - ./.envs/.local/.postgres
+    # ports:
+    #   - "5433:5432"
+    volumes:
+      - pgvector2_data:/var/lib/postgresql/data
     
 
   celeryworker:
