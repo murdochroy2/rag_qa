@@ -8,3 +8,6 @@ class DocumentSerializer(serializers.Serializer):
 class DocumentSelectionSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     selected = serializers.BooleanField()
+
+class QuestionSerializer(serializers.Serializer):
+    question = serializers.CharField(max_length=2048)
