@@ -15,9 +15,9 @@ def build_index(document_id):
     document.save()
 
 @shared_task()
-def get_rag_response(self, documents: tuple[int], query: str):
+def get_rag_response(documents: tuple[int], query: str):
     document_names = _get_document_names(documents)
-    result = query_vector_db(documents, query)
+    result = query_vector_db(document_names, query)
     return result
 
 def _get_document_names(documents):
