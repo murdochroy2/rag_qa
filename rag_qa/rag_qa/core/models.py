@@ -13,5 +13,5 @@ class Question(models.Model):
     question_id = models.CharField(max_length=2048, null=False, blank=False)
     status = models.CharField(
         choices=[('in_progress', 'in_progress'), ('sucess', 'success'), ('failed', 'failed')], 
-        max_length=20),
+        max_length=20)
     answer_id = models.CharField(max_length=64)
