@@ -13,6 +13,16 @@ Moved to [settings](https://cookiecutter-django.readthedocs.io/en/latest/1-getti
 
 ## Basic Commands
 
+**Important Note:** Navigate to the `rag_qa` directory where the docker compose files are present before running the following commands. To run any command in the application using Docker, use the following command:
+
+    $ docker-compose -f docker-compose.local.yml run --rm django <command-you-want-to-run>
+
+### Unit tests
+
+To run unit tests using Docker, use the following command:
+
+    $ docker-compose -f docker-compose.local.yml run --rm django python manage.py test rag_qa.core.api.tests
+
 ### Setting Up Your Users
 
 - To create a **normal user account**, just go to Sign Up and fill out the form. Once you submit it, you'll see a "Verify Your E-mail Address" page. Go to your console to see a simulated email verification message. Copy the link into your browser. Now the user's email should be verified and ready to go.
@@ -40,6 +50,12 @@ To run the tests, check your test coverage, and generate an HTML coverage report
 #### Running tests with pytest
 
     $ pytest
+
+#### Running unit tests with Docker
+
+To run unit tests using Docker, use the following command:
+
+    $ docker-compose -f docker-compose.local.yml run --rm django python manage.py test rag_qa.core.api.tests
 
 ### Live reloading and Sass CSS compilation
 
