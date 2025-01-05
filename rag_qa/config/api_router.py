@@ -13,7 +13,7 @@ router.register("users", UserViewSet)
 
 app_name = "api"
 urlpatterns = router.urls + [
-    path("document/", DocumentIngestView.as_view(), name="document_ingest"),
-    path("document/selection/", DocumentSelectionView.as_view(), name="document_selection"),
-    path("question/", QuestionAnswerView.as_view(), name="question_answer"),
+    path("document/", DocumentIngestView.as_view(), name="document-ingest"),
+    path("document/selection/", DocumentSelectionView.as_view(), name="document-selection"),
+    path("question-answer/", QuestionAnswerView.as_view(), name="question-answer"),
 ]
