@@ -1,4 +1,6 @@
-# Create your views here.
+"""
+This module contains API views for handling document ingestion and selection.
+"""
 import time
 from django.db import transaction
 
@@ -21,9 +23,18 @@ from django.http import JsonResponse
 from celery.result import AsyncResult
 
 class DocumentIngestView(APIView):
+    """
+    Handles the ingestion of documents into the system.
+    """
     permission_classes = [AllowAny]
 
     def post(self, request):
+        """
+        Ingests a document into the system.
+        
+        :param request: The request containing the document details.
+        :return: A response indicating the success or failure of the ingestion.
+        """
         serializer = DocumentSerializer(data=request.data)
         if serializer.is_valid():
             file_path = serializer.validated_data["file_path"]
@@ -39,24 +50,51 @@ class DocumentIngestView(APIView):
         )
     
     def _save_document(self, file_path, name):
+        """
+        Saves a document to the database.
+        
+        :param file_path: The path to the document file.
+        :param name: The name of the document.
+        :return: The saved document instance.
+        """
         document = Document(file_path=file_path, name=name)
         document.save()
         return document
 
     def _process_document(self, document):
+        """
+        Initiates the processing of a document after it has been saved.
+        
+        :param document: The document instance to be processed.
+        """
         document_id = document.id
         transaction.on_commit(func=lambda: build_index.apply_async(args=[document_id]))
 
     
 class DocumentSelectionView(APIView):
+    """
+    Handles the selection of documents for processing.
+    """
     permission_classes = [AllowAny]
 
     def get(self, request):
-        documents = Document.objects.all()
+        """
+        Retrieves a list of all documents in the system.
+        
+        :param request: The request for the list of documents.
+        :return: A response containing the list of documents.
+        """
+        documents = Document.objects.all() # TODO: Filter by indexed documents
         serializer = DocumentSelectionSerializer(documents, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def put(self, request):
+        """
+        Updates the selection status of documents.
+        
+        :param request: The request containing the document selection details.
+        :return: A response indicating the success or failure of the update.
+        """
         serializer = DocumentSelectionSerializer(data=request.data, many=True)
         if serializer.is_valid():
             for details in serializer.validated_data:
@@ -65,9 +103,18 @@ class DocumentSelectionView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class QuestionAnswerView(APIView):
+    """
+    Handles the processing of questions and retrieval of answers.
+    """
     permission_classes = [AllowAny]
 
     def post(self, request):
+        """
+        Processes a question and retrieves an answer.
+        
+        :param request: The request containing the question.
+        :return: A response containing the answer and the status of the processing.
+        """
         serializer = QuestionSerializer(data=request.data)
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -78,16 +125,27 @@ class QuestionAnswerView(APIView):
         model_object, created = Question.objects.get_or_create(question_id=question_id)
 
         if model_object.status == 'in_progress':
-            answer = self._check_task_status(model_object)
+            answer = self._check_progress(model_object)
         else:
             answer = self._initiate_task(model_object, documents, question)
 
         return Response({"answer": answer, "status": model_object.status}, status=status.HTTP_200_OK)
 
     def _get_documents(self):
+        """
+        Retrieves a tuple of IDs of documents that are selected for processing.
+        
+        :return: A tuple of document IDs.
+        """
         return tuple(Document.objects.filter(selected=True).order_by("id").values_list("id", flat=True))
 
-    def _check_task_status(self, model_object):
+    def _check_progress(self, model_object):
+        """
+        Checks the progress of a question processing task.
+        
+        :param model_object: The model object representing the question.
+        :return: The answer to the question or a status message.
+        """
         task = AsyncResult(model_object.answer_id)
         if task.ready():
             if task.status == 'SUCCESS':
@@ -102,6 +160,14 @@ class QuestionAnswerView(APIView):
         return answer
 
     def _initiate_task(self, model_object, documents, question):
+        """
+        Initiates the processing of a question.
+        
+        :param model_object: The model object representing the question.
+        :param documents: A tuple of document IDs.
+        :param question: The question to be processed.
+        :return: A status message indicating the initiation of processing.
+        """
         task = get_rag_response.apply_async(args=[documents, question])
         model_object.answer_id = task.id
         model_object.status = 'in_progress'
